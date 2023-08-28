@@ -21,7 +21,7 @@ export default function SignUpPage() {
 
     if(password === confirmPassword){
       axios.post(`${import.meta.env.VITE_API_URL}/sign-up`, signupInfo)
-        .then(resp => {navigate('/')})
+        .then(navigate('/'))
         .catch(err => {alert(err.response.data)});
     } else {
       alert('Confirm your password again!')
