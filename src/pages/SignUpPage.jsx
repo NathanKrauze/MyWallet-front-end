@@ -36,25 +36,29 @@ export default function SignUpPage() {
           placeholder="Nome" 
           type="text" 
           value={name}
-          onChange={e => setName(e.target.value)}/>
+          onChange={e => setName(e.target.value)}
+          data-test='name' />
         <input 
           placeholder="E-mail" 
           type="email" 
           value={email}
-          onChange={e => setEmail(e.target.value)}/>
+          onChange={e => setEmail(e.target.value)}
+          data-test='email' />
         <input 
           placeholder="Senha" 
           type="password" 
           autocomplete="new-password" 
           value={password}
-          onChange={e => setPassword(e.target.value)}/>
+          onChange={e => setPassword(e.target.value)}
+          data-test='password' />
         <input 
           placeholder="Confirme a senha" 
           type="password" 
           autocomplete="new-password"
           value={confirmPassword} 
-          onChange={e => setConfirmPassword(e.target.value)}/>
-        <button type="submit">Cadastrar</button>
+          onChange={e => setConfirmPassword(e.target.value)}
+          data-test='conf-password'/>
+        <button type="submit"data-test='sign-up-submit'>Cadastrar</button>
       </form>
 
       <Link to="/">

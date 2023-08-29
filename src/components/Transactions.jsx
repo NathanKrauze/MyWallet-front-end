@@ -6,9 +6,9 @@ export default function Transactions({transaction}){
         <ListItemContainer>
             <div>
               <span>{date}</span>
-              <strong>{description}</strong>
+              <strong data-test='registry-name' >{description}</strong>
             </div>
-            <Value color={type}>{value.toFixed(2).toString().replace('.', ',')}</Value>
+            <Value color={type} data-test='registry-amount' >{value.toFixed(2).toString().replace('.', ',')}</Value>
         </ListItemContainer>
     )
 }

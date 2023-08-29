@@ -7,7 +7,7 @@ import AuthContext from "../contexts/AuthConstext";
 
 export default function SignInPage() {
 
-  const { setToken } = useContext(AuthContext)
+  const { setToken, setUserName } = useContext(AuthContext)
 
   const[email, setEmail] = useState('');
   const[password, setPassword] = useState('')
@@ -20,7 +20,8 @@ export default function SignInPage() {
     e.preventDefault()
     axios.post(`${import.meta.env.VITE_API_URL}/sign-in`, loginInfo)
       .then(res => {
-        setToken(res.data);
+        setToken(res.data.token);
+        setUserName(res.data.user);
         localStorage.setItem("token", res.data);
         navigate('/home');
       }).catch(err => alert(err.response.data))
@@ -34,14 +35,16 @@ export default function SignInPage() {
           placeholder="E-mail" 
           type="email" 
           value={email}
-          onChange={e => setEmail(e.target.value)}/>
+          onChange={e => setEmail(e.target.value)}
+          data-test='email' />
         <input 
           placeholder="Senha" 
           type="password" 
           autocomplete="new-password"
           value={password}
-          onChange={e => setPassword(e.target.value)} />
-        <button type="submit">Entrar</button>
+          onChange={e => setPassword(e.target.value)}
+          data-test='password' />
+        <button type="submit" data-test='sign-in-submit' >Entrar</button>
       </form>
 
       <Link to="/cadastro">

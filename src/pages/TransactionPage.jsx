@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import AuthContext from "../contexts/AuthConstext";
@@ -9,6 +9,13 @@ export default function TransactionsPage() {
   const [description, setDescription] = useState('');
   const { token } = useContext(AuthContext)
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if(!token){
+      navigate('/');
+    }
+  
+  }, [])
 
   const params = useParams();
   let textType;
@@ -44,13 +51,15 @@ export default function TransactionsPage() {
           placeholder="Valor" 
           type="text"
           value={transactionValue}
-          onChange={e => setTransactionValue(e.target.value)}/>
+          onChange={e => setTransactionValue(e.target.value)}
+          data-test='registry-amount-input' />
         <input 
           placeholder="Descrição" 
           type="text" 
           value={description}
-          onChange={e => setDescription(e.target.value)}/>
-        <button type="submit">Salvar {textType}</button>
+          onChange={e => setDescription(e.target.value)}
+          data-test='registry-name-input' />
+        <button type="submit"data-test='registry-save' >Salvar {textType}</button>
       </form>
     </TransactionsContainer>
   )

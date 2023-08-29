@@ -9,20 +9,25 @@ import Transactions from "../components/Transactions"
 
 export default function HomePage() {
   const[transactions, setTransactions] = useState([]);
-  const {token} = useContext(AuthContext);
+  const {token, setToken, userName} = useContext(AuthContext);
 
   const navigate = useNavigate();
 
+  const auth = {
+    headers: {
+      authorization: `Bearer ${token}`
+    }
+  }
+
   useEffect(()=>{
-    const auth = {
-      headers: {
-        authorization: `Bearer ${token}`
-      }
+
+    if(!token){
+      return navigate('/');
     }
 
     axios.get(`${import.meta.env.VITE_API_URL}/transactions`, auth)
-      .then(res => setTransactions(res.data))
-      .catch(err => alert(err.response));
+      .then(res => {setTransactions(res.data)})
+      .catch(err => alert(err.response.data));
   },[]);
 
   function newTransaction(transactionType){
@@ -35,11 +40,21 @@ export default function HomePage() {
     return balance.toFixed(2);
   }
 
+  function signOut(){
+    axios.delete(`${import.meta.env.VITE_API_URL}/sign-out`, auth)
+      .then(()=>{
+        localStorage.removeItem("token")
+        setToken(undefined)
+        navigate('/');
+      })
+      .catch(err => alert(err.response.data))
+  }
+
   return (
     <HomeContainer>
       <Header>
-        <h1>Olá, Fulano</h1>
-        <BiExit />
+        <h1>Olá, <span data-test='user-name' >{userName}</span></h1>
+        <BiExit onClick={signOut} data-test='logout' />
       </Header>
 
       <TransactionsContainer>
@@ -48,18 +63,18 @@ export default function HomePage() {
         </ul>
         <article>
           <strong>Saldo</strong>
-          <Value color={userBalance() >= 0 ? "positivo" : "negativo"}>{userBalance().toString().replace('.', ',')}</Value>
+          <Value color={userBalance() >= 0 ? "positivo" : "negativo"} data-test='total-amount' >{userBalance().toString().replace('.', ',')}</Value>
         </article>
       </TransactionsContainer>
 
 
       <ButtonsContainer>
 
-        <button onClick={()=>newTransaction('entrada')}>
+        <button onClick={()=>newTransaction('entrada')}data-test='new-income' >
           <AiOutlinePlusCircle />
           <p>Nova <br /> entrada</p>
         </button>
-        <button onClick={()=>newTransaction('saida')}>
+        <button onClick={()=>newTransaction('saida')}data-test='new-expense' >
           <AiOutlineMinusCircle />
           <p>Nova <br />saída</p>
         </button>
@@ -92,13 +107,19 @@ const TransactionsContainer = styled.article`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow-y: scroll;
   article {
+    margin-top: 8px;
     display: flex;
     justify-content: space-between;   
     strong {
       font-weight: 700;
       text-transform: uppercase;
     }
+  }
+  ul{
+    height: 100%;
+    overflow-y: scroll;
   }
 `
 const ButtonsContainer = styled.section`

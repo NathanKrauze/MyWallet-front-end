@@ -10,11 +10,12 @@ import { useState } from "react"
 export default function App() {
 
   const [token, setToken] = useState(localStorage.getItem("token"));
+  const [userName, setUserName] = useState('')
 
   return (
     <PagesContainer>
       <BrowserRouter>
-        <AuthContext.Provider value={{ token, setToken }}>
+        <AuthContext.Provider value={{ token, setToken, userName, setUserName }}>
           <Routes>
             <Route path="/" element={<SignInPage />} />
             <Route path="/cadastro" element={<SignUpPage />} />
