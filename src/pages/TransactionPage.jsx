@@ -1,13 +1,56 @@
-import styled from "styled-components"
+import { useContext, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import styled from "styled-components";
+import AuthContext from "../contexts/AuthConstext";
+import axios from "axios";
 
 export default function TransactionsPage() {
+  const [transactionValue, setTransactionValue] = useState('');
+  const [description, setDescription] = useState('');
+  const { token } = useContext(AuthContext)
+  const navigate = useNavigate();
+
+  const params = useParams();
+  let textType;
+  if (params.tipo === 'saida'){
+    textType = 'saída';
+  }else{
+    textType = 'entrada';
+  };
+
+  function sendTransaction(e){
+    e.preventDefault();
+
+    const auth = {
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    };
+    let value = transactionValue;
+    value = parseFloat(value.replace(',','.'))
+      
+
+    const transaction = {value, description, type: params.tipo};
+    axios.post(`${import.meta.env.VITE_API_URL}/add-transaction`, transaction, auth)
+      .then(navigate('/home'))
+      .catch(err => alert(err.response.data));
+  }
+
   return (
     <TransactionsContainer>
-      <h1>Nova TRANSAÇÃO</h1>
-      <form>
-        <input placeholder="Valor" type="text"/>
-        <input placeholder="Descrição" type="text" />
-        <button>Salvar TRANSAÇÃO</button>
+      <h1>Nova {textType}</h1>
+      <form onSubmit={sendTransaction}>
+        <input 
+          placeholder="Valor" 
+          type="text"
+          value={transactionValue}
+          onChange={e => setTransactionValue(e.target.value)}/>
+        <input 
+          placeholder="Descrição" 
+          type="text" 
+          value={description}
+          onChange={e => setDescription(e.target.value)}/>
+        <button type="submit">Salvar {textType}</button>
       </form>
     </TransactionsContainer>
   )

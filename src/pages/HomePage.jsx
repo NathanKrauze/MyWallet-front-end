@@ -1,8 +1,40 @@
 import styled from "styled-components"
 import { BiExit } from "react-icons/bi"
 import { AiOutlineMinusCircle, AiOutlinePlusCircle } from "react-icons/ai"
+import { useContext, useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import AuthContext from "../contexts/AuthConstext"
+import axios from "axios"
+import Transactions from "../components/Transactions"
 
 export default function HomePage() {
+  const[transactions, setTransactions] = useState([]);
+  const {token} = useContext(AuthContext);
+
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    const auth = {
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    }
+
+    axios.get(`${import.meta.env.VITE_API_URL}/transactions`, auth)
+      .then(res => setTransactions(res.data))
+      .catch(err => alert(err.response));
+  },[]);
+
+  function newTransaction(transactionType){
+    navigate(`/nova-transacao/${transactionType}`)
+  }
+
+  let balance;
+  function userBalance(){
+    balance = transactions.reduce((acc, cur)=> cur.type === 'entrada' ? acc + cur.value : acc - cur.value, 0);
+    return balance.toFixed(2);
+  }
+
   return (
     <HomeContainer>
       <Header>
@@ -12,36 +44,22 @@ export default function HomePage() {
 
       <TransactionsContainer>
         <ul>
-          <ListItemContainer>
-            <div>
-              <span>30/11</span>
-              <strong>Almoço mãe</strong>
-            </div>
-            <Value color={"negativo"}>120,00</Value>
-          </ListItemContainer>
-
-          <ListItemContainer>
-            <div>
-              <span>15/11</span>
-              <strong>Salário</strong>
-            </div>
-            <Value color={"positivo"}>3000,00</Value>
-          </ListItemContainer>
+          {transactions.map(transaction => <Transactions key={transaction._id} transaction={transaction}/>)}
         </ul>
-
         <article>
           <strong>Saldo</strong>
-          <Value color={"positivo"}>2880,00</Value>
+          <Value color={userBalance() >= 0 ? "positivo" : "negativo"}>{userBalance().toString().replace('.', ',')}</Value>
         </article>
       </TransactionsContainer>
 
 
       <ButtonsContainer>
-        <button>
+
+        <button onClick={()=>newTransaction('entrada')}>
           <AiOutlinePlusCircle />
           <p>Nova <br /> entrada</p>
         </button>
-        <button>
+        <button onClick={()=>newTransaction('saida')}>
           <AiOutlineMinusCircle />
           <p>Nova <br />saída</p>
         </button>
@@ -106,16 +124,4 @@ const Value = styled.div`
   font-size: 16px;
   text-align: right;
   color: ${(props) => (props.color === "positivo" ? "green" : "red")};
-`
-const ListItemContainer = styled.li`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  color: #000000;
-  margin-right: 10px;
-  div span {
-    color: #c6c6c6;
-    margin-right: 10px;
-  }
 `
